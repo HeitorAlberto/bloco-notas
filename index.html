@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,8 +22,12 @@
     header {
       background: #333;
       color: white;
-      padding: 10px;
       text-align: center;
+      padding: 10px;
+    }
+
+    header h2 {
+      margin: 0;
     }
 
     textarea {
@@ -30,7 +35,7 @@
       width: 100%;
       border: none;
       padding: 15px;
-      padding-bottom: 60px; /* espaço para o indicador */
+      padding-bottom: 60px;
       font-size: 16px;
       resize: none;
       outline: none;
@@ -56,22 +61,42 @@
       border-radius: 5px;
     }
 
-    .print { background: #4CAF50; color: white; }
-    .clear { background: #f44336; color: white; }
-    .font  { background: #2196F3; color: white; flex: 0.5; }
+    .print {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .clear {
+      background: #f44336;
+      color: white;
+    }
+
+    .font {
+      background: #2196F3;
+      color: white;
+      flex: 0.5;
+    }
 
     .font-info {
       position: absolute;
-      bottom: 70px; /* sobe acima dos botões */
+      bottom: 70px;
       right: 15px;
       font-size: 14px;
       color: #333;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.9);
       padding: 8px 12px;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       pointer-events: none;
       z-index: 10;
+    }
+
+    /* Área usada apenas para impressão */
+    #printArea {
+      display: none;
+      white-space: pre-wrap;
+      font-family: 'Ubuntu', sans-serif;
+      padding: 20px;
     }
 
     @media (max-width: 480px) {
@@ -80,81 +105,94 @@
         flex: 1 1 100%;
       }
 
-      .print, .clear {
+      .print,
+      .clear {
         flex: 1 1 100%;
       }
     }
 
     @media print {
-      header, .buttons, .font-info {
+
+      header,
+      .buttons,
+      .font-info,
+      textarea {
         display: none;
       }
 
-      textarea {
-        border: none;
+      #printArea {
+        display: block;
         font-size: 18px;
+        text-align: justify;
       }
     }
   </style>
 </head>
+
 <body>
 
-<header>
-  <h2>Bloco de Notas</h2>
-</header>
+  <header>
+    <h2>Bloco de Notas</h2>
+  </header>
 
-<textarea id="note" placeholder="Digite suas anotações aqui..."></textarea>
+  <textarea id="note" placeholder="Digite suas anotações aqui..."></textarea>
 
-<div class="buttons">
-  <button class="font" onclick="decreaseFont()">A-</button>
-  <button class="font" onclick="increaseFont()">A+</button>
-  <button class="print" onclick="printNote()">Imprimir / Salvar PDF</button>
-  <button class="clear" onclick="clearNote()">Limpar</button>
-</div>
+  <div class="buttons">
+    <button class="font" onclick="decreaseFont()">A-</button>
+    <button class="font" onclick="increaseFont()">A+</button>
+    <button class="print" onclick="printNote()">Imprimir / Salvar PDF</button>
+    <button class="clear" onclick="clearNote()">Limpar</button>
+  </div>
 
-<div class="font-info" id="fontInfo"></div>
+  <div class="font-info" id="fontInfo"></div>
 
-<script>
-  const textarea = document.getElementById('note');
-  const fontInfo = document.getElementById('fontInfo');
+  <!-- Área oculta usada para impressão -->
+  <div id="printArea"></div>
 
-  let fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
+  <script>
+    const textarea = document.getElementById('note');
+    const fontInfo = document.getElementById('fontInfo');
+    const printArea = document.getElementById('printArea');
 
-  function updateFont() {
-    textarea.style.fontSize = fontSize + 'px';
-    fontInfo.textContent = 'Fonte: ' + fontSize + 'px';
-    localStorage.setItem('fontSize', fontSize);
-  }
+    let fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
 
-  updateFont();
-
-  textarea.value = localStorage.getItem('note') || '';
-
-  textarea.addEventListener('input', () => {
-    localStorage.setItem('note', textarea.value);
-  });
-
-  function printNote() {
-    window.print();
-  }
-
-  function clearNote() {
-    if (confirm('Deseja apagar tudo?')) {
-      textarea.value = '';
-      localStorage.removeItem('note');
+    function updateFont() {
+      textarea.style.fontSize = fontSize + 'px';
+      fontInfo.textContent = 'Fonte: ' + fontSize + 'px';
+      localStorage.setItem('fontSize', fontSize);
     }
-  }
 
-  function increaseFont() {
-    fontSize += 2;
     updateFont();
-  }
 
-  function decreaseFont() {
-    fontSize = Math.max(10, fontSize - 2);
-    updateFont();
-  }
-</script>
+    textarea.value = localStorage.getItem('note') || '';
+
+    textarea.addEventListener('input', () => {
+      localStorage.setItem('note', textarea.value);
+    });
+
+    function printNote() {
+      printArea.textContent = textarea.value;
+      window.print();
+    }
+
+    function clearNote() {
+      if (confirm('Deseja apagar tudo?')) {
+        textarea.value = '';
+        localStorage.removeItem('note');
+      }
+    }
+
+    function increaseFont() {
+      fontSize += 2;
+      updateFont();
+    }
+
+    function decreaseFont() {
+      fontSize = Math.max(10, fontSize - 2);
+      updateFont();
+    }
+  </script>
 
 </body>
+
 </html>
